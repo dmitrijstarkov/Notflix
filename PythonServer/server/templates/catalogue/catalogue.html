@@ -9,13 +9,17 @@
       {% for key,value in video_data.items() %}
 
       <form action="videos" method="post">
-      <input type="hidden" name="video_url" value="{{key}}">
-      <input type="hidden" name="video_name" value="{{value[2]}}">
-      <input class="btn-default" type="submit" value="WATCH: {{value[2]}}">
+      <input type="hidden" name="URL" value="{{value[0]}}">
+      <input type="hidden" name="VIDEO TITLE" value="{{key}}">
+      <input class="btn-default" type="submit" value="WATCH: {{key}} - Season {{value[4]}} - Episode {{value[5]}}">
       </form>
+      
       <br>
-            <p><b>Genre:</b> {{value[1]}}</p>
+            <p><b>Video Type:</b> {{value[1]}}</p>
+            <p><b>Genre:</b> {{value[2]}}</p>
             <p><b>Description:</b> {{value[3]}}</p>
-      <br>
+            <p><b>Season:</b> {{value[4]}}</p>
+            <p><b>Episode:</b> {{value[5]}}</p>
+      <br>     
       {% endfor %}
 {% endblock %}

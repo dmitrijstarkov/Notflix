@@ -7,4 +7,3 @@ COPY nginx.conf /etc/nginx
 RUN mkdir -p /data
 CMD service nginx start && tail -F /var/log/nginx/error-streaming.log
 EXPOSE 80
-

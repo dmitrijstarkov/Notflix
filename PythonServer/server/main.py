@@ -48,8 +48,6 @@ def login_required(f):
 @login_required
 def catalogue():
 	
-	
-	
 	if request.method == 'POST':
 		
 		r=request.form['video_url']
@@ -67,6 +65,7 @@ def catalogue():
 		,i['video_title']\
 		,i['video_description']] for i in payload['_embedded']['rh:doc']}
 		
+		# !@!@!@!@ Don't for get to change this v back to "catalogue/catalogue.ht,l"
 		
 		return render_template('/catalogue/catalogue.html'\
 		,video_data=dvids\
@@ -131,4 +130,4 @@ def account():
 
 # start the server with the 'run()' method
 if __name__ == '__main__':
-    app.run(host='0.0.0.0',debug=True,port=80)
+    app.run(host='0.0.0.0',debug=True,port=82)

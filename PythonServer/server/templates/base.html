@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% block head %}
+    <title>{{Page_Name}}</title>
+    {% endblock %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="static/bootstrap.min.css" rel="stylesheet" media="screen">
+    <style>
+    #navmenu ul {background: grey; margin: 10px; padding: 10px; 
+    	list-style-type: none; list-style-image: none; }
+    #navmenu li {display: inline; padding: 10px 75px 5px 20px}
+    #navmenu a {text-decoration:none; color: white; }
+    #navmenu a:hover {color: orange;}
+    .btn-lg {
+      
+        background-color: orange;
+        color: black;
+        border-color: #adadad;
+        border-radius: 5px;}
+    
+    .btn-block {
+  
+        background-color: white;
+        color: black;
+        border-color: blue;
+        border-radius: 5px;}
+    
+    .btn-default {
+
+        background-color: white;
+        color: black;
+        border-color: blue;
+        border-radius: 5px;}
+    
+    
+    </style>
+    
+
+  </head>
+  <body>
+    <div id="navmenu">
+    <ul>
+      
+      {% for link in nav_links %}
+      
+    	<li><a href="{{link}}">{{link}}</a></li>
+      
+      {% endfor %}
+      
+    </ul>
+    </div>
+
+    <div class="container">
+      <br>
+      <!-- messages -->
+      {% for message in get_flashed_messages() %}
+
+        {{ message }}
+      {% endfor %}
+        <br>
+      <!-- child template -->
+      {% block content %}{% endblock %}
+      <br>
+      <!-- errors -->
+      {% if error %}
+        <p class="error"><strong>Error:</strong> {{ error }}</p>
+      {% endif %}
+    </div>
+  </body>
+</html>

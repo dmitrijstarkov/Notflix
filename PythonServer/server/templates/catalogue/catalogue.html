@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+    {% block head %}
+    {{super()}}
+    {% endblock %}
+      <br>
+      <div class ="cat-vid container">
+        
+      {% for key,value in video_data.items() %}
+
+      <form action="videos" method="post">
+      <input type="hidden" name="video_url" value="{{key}}">
+      <input type="hidden" name="video_name" value="{{value[2]}}">
+      <input class="btn-default" type="submit" value="WATCH: {{value[2]}}">
+      </form>
+      <br>
+            <p><b>Genre:</b> {{value[1]}}</p>
+            <p><b>Description:</b> {{value[3]}}</p>
+      <br>
+      {% endfor %}
+{% endblock %}

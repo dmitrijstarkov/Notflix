@@ -1,14 +1,13 @@
 ## Notflix v1.0.10
 
-#### Python Server
+### Module Requirements:
 
-Module Requirements:
 * **Flask** (http://flask.pocoo.org/) to do the web serving.
 * **Requests** (https://pypi.python.org/pypi/requests) to do the the API requests.
 * **JSON** (https://pypi.python.org/pypi/json) to format things as JSON strings
 * **FUNCTOOLS** (https://pypi.python.org/pypi/functools) to use wrap()
 
-##### How it works
+### How it works
 
 * @app.route(website page , http request methods) - defines "web pages"
 * def page() - functions to run when page's app.route is called by client
@@ -20,7 +19,7 @@ Module Requirements:
 * redirect(url_for()) - move to a different page for whatever reason
 * GETS from a webpage with Flask need to be made with input forms
 
-More:
+### More how it works
 
 		payloadtv=get_resource(EP_COLLECTION_URL,params=None).json()
 

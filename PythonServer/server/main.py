@@ -8,7 +8,7 @@ from restheart import \
 post_resource, get_resource, put_resource, get_omdb
 
 from video_api import \
-VIDEO_DATABASE_URL, VIDEO_COLLECTION_URL, VIDEO_HEADERS
+EP_COLLECTION_URL, FILM_COLLECTION_URL
 
 import json
 
@@ -43,7 +43,7 @@ def login_required(f):
 def catalogue():
 	
 	if request.method == 'POST':
-		
+		print(request.form['URL'])
 		return render_template(\
 		'/videos/video.html'\
 		,link=request.form['URL']\
@@ -52,26 +52,27 @@ def catalogue():
 		,nav_links=nav_links[2:5])
 	
 	else:
-		payload=get_resource(\
-		VIDEO_COLLECTION_URL\
+		payloadtv=get_resource(\
+		EP_COLLECTION_URL\
 		,params=None).json()
 		
-		dvids = {\
-		i['VIDEO TITLE']\
-		:[i['URL']\
-		,i['TYPE']\
-		,i['GENRE']\
-		,i['DESCRIPTION']\
-		,i['SEASON']\
-		,i['EPISODE']\
-		] for i in payload['_embedded']['rh:doc']}
+		payloadmovie=get_resource(\
+		FILM_COLLECTION_URL\
+		,params=None).json()
+		 
+		#print(payloadtv)
 		
-		pay2=\
-		get_omdb(\
-		"http://www.omdbapi.com/?i=tt0082971&plot=short&r=json"\
-		,params=None\
-		)
-		print(pay2.json())
+		dvids = {\
+		i['Title']\
+		:[i['server_url']\
+		,i['Series Title']\
+		,i['Genre']\
+		,i['Plot']\
+		,i['Season']\
+		,i['Episode']\
+		,i['Runtime']\
+		,i['imdbRating']\
+		] for i in payloadtv['_embedded']['rh:doc']}
 		
 		return render_template(\
 		'/catalogue/catalogue.html'\

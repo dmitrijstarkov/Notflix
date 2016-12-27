@@ -2,6 +2,10 @@
 
 * Networking? - set up restheart on a network, connect webserver to network
 * Makes it isolated
+* Volumes
+  * Video db volume
+  * mongodb config??!
+  * 
 
 ## Services
 

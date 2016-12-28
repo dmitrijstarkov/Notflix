@@ -8,14 +8,17 @@ from restheart import \
 post_resource, get_resource, put_resource, get_omdb
 
 from video_api import \
-EP_COLLECTION_URL, FILM_COLLECTION_URL
+_BASE_URL
+
+from funcs import unique
 
 import json
 
 nav_links=["/"\
 ,"/register"\
 ,"/logout"\
-,"/videos"\
+,"/tv_shows"\
+,"/films"\
 ,"/account"]
 
 # create the application object
@@ -23,6 +26,7 @@ app = Flask(__name__)
 
 # use a random key generator (form seperate config file)
 app.secret_key= "my precious" 
+
 
 def login_required(f):
 	@wraps(f)
@@ -35,50 +39,79 @@ def login_required(f):
 				return redirect(url_for('login'))
 	return wrap
 
-
-
-# use decorators to link the function to a url
-@app.route('/videos',methods=['GET','POST'])
+@app.route('/films',methods=['GET','POST'])
 @login_required
-def catalogue():
+def films_cat():
 	
 	if request.method == 'POST':
+	
+		# todo PUT to usage database
+	
 		print(request.form['URL'])
 		return render_template(\
 		'/videos/video.html'\
 		,link=request.form['URL']\
 		,name=request.form['VIDEO TITLE']\
 		,Page_Name=request.form['VIDEO TITLE']\
-		,nav_links=nav_links[2:5])
+		,nav_links=nav_links[2:6]\
+		,back='/films')
 	
 	else:
-		payloadtv=get_resource(\
-		EP_COLLECTION_URL\
-		,params=None).json()
 		
-		payloadmovie=get_resource(\
-		FILM_COLLECTION_URL\
-		,params=None).json()
-		 
-		#print(payloadtv)
+		payloadmovie=get_resource(_BASE_URL+'/movie',params=None).json()
+		movie_json=payloadmovie['_embedded']['rh:coll']
 		
-		dvids = {\
-		i['Title']\
-		:[i['server_url']\
-		,i['Series Title']\
-		,i['Genre']\
-		,i['Plot']\
-		,i['Season']\
-		,i['Episode']\
-		,i['Runtime']\
-		,i['imdbRating']\
-		] for i in payloadtv['_embedded']['rh:doc']}
+		filmlist=[movie_json[i]['_id'] for i,j in enumerate(movie_json)]
+		
+		film_metadata={i:[get_resource(_BASE_URL+'/movie/'+str(i),params=None)\
+		.json()['_embedded']['rh:doc'][0]] for i in filmlist}
+		
+		return render_template(\
+		'/catalogue/films.html'\
+		,video_data=film_metadata\
+		,Page_Name="Catalogue - Films"\
+		,nav_links=nav_links[2:6])
+
+
+# use decorators to link the function to a url
+@app.route('/tv_shows',methods=['GET','POST'])
+@login_required
+def tv_cat():
+	
+	if request.method == 'POST':
+
+		# todo PUT to usage database
+
+		print(request.form['URL'])
+		return render_template(\
+		'videos/video.html'\
+		,link=request.form['URL']\
+		,name=request.form['VIDEO TITLE']\
+		,Page_Name=request.form['VIDEO TITLE']\
+		,nav_links=nav_links[2:6]\
+		,back='/tv_shows')
+	
+	else:
+
+		# this is only brining back video data for one series title
+		# does the put in mondodb_data.py need to be changed?
+
+		series_metadata=get_resource(\
+		_BASE_URL+'/episode'\
+		,params=None).json()
+
+		hello=series_metadata['_embedded']['rh:coll']
+		tv_list=[hello[i]['_id'] for i,j in enumerate(hello)]
+
+		tv_metadata={i:[get_resource(_BASE_URL+'/episode/'+str(i)\
+		,params=None).json()['_embedded']['rh:doc'][0]] for i in tv_list}
 		
 		return render_template(\
 		'/catalogue/catalogue.html'\
-		,video_data=dvids\
-		,Page_Name="Catalogue"\
-		,nav_links=nav_links[2:5])
+		,series=tv_list\
+		,video_data=tv_metadata\
+		,Page_Name="Catalogue - TV Shows"\
+		,nav_links=nav_links[2:6])
 
 # route for handling the login page logic
 @app.route('/', methods=['GET', 'POST'])

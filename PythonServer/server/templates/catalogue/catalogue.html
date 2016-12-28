@@ -1,27 +1,39 @@
 {% extends "base.html" %}
 {% block content %}
+
     {% block head %}
     {{super()}}
     {% endblock %}
       <br>
+      
+      {% for i,j in video_data.items() %}
+      
+      <h3>{{i}}</h3>
+      
       <div class ="cat-vid container">
-        
-      {% for key,value in video_data.items() %}
 
-            <h3>{{value[1]}}</h3>
-            <h4>season/episode:  {{value[5]}}/{{value[5]}}</h4>
+            <h4>season/episode:  {{j[0].items()[8][1]}}/{{j[0].items()[14][1]}}</h4>
 
       <br>
-      <form action="videos" method="post">
-      <input type="hidden" name="URL" value="{{value[0]}}">
-      <input type="hidden" name="VIDEO TITLE" value="{{key}}">
-      <input class="btn-default" type="submit" value="WATCH: {{key}}">
+      <form action="tv_shows" method="post">
+      <input type="hidden" name="URL" value="{{j[0].items()[18][1]}}">
+      <input type="hidden" name="VIDEO TITLE" value="{{j[0].items()[2][1]}}">
+      <input class="btn-default" type="submit" value="WATCH: {{j[0].items()[2][1]}}">
       </form>
       
       <br>
-            <p><b>Description:</b> {{value[3]}}</p>
-            <p><b>Genre:</b> {{value[2]}} / <b>Runtime:</b> {{value[6]}} / <b>imdb Rating:</b> {{value[7]}}</p> 
+            <p><b>Description:</b> {{j[0].items()[0][1]}}</p>
+            <p><b>Genre:</b> {{j[0].items()[12][1]}} /// 
+              
+              <b>Runtime:</b>
+              
+               {{j[0].items()[19][1]}} /// <b>imdb Rating:</b> {{j[0].items()[13][1]}}</p> 
             <p></p>
       <br>     
+
+      
+    </div>
+      
       {% endfor %}
+      
 {% endblock %}

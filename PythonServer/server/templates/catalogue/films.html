@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+
+    {% block head %}
+    {{super()}}
+    {% endblock %}
+      <br>
+      
+      {% for i,j in video_data.items() %}
+      
+      <h3>{{i}}</h3>
+      <div class ="cat-vid container">
+
+      <br>
+      <form action="films" method="post">
+      <input type="hidden" name="URL" value="{{j[0].items()[15][1]}}">
+      <input type="hidden" name="VIDEO TITLE" value="{{i}}">
+      <input class="btn-default" type="submit" value="WATCH: {{i}}">
+      </form>
+      
+      <br>
+            <p><b>Description:</b> {{j[0].items()[0][1]}}</p>
+            <p><b>Genre:</b> {{j[0].items()[11][1]}} /// 
+              
+              <b>Runtime:</b>
+              
+               {{j[0].items()[16][1]}} /// <b>imdb Rating:</b> {{j[0].items()[19][1]}}</p> 
+            <p></p>
+      <br>     
+
+      
+    </div>
+      
+      {% endfor %}
+      
+{% endblock %}

@@ -2,22 +2,57 @@
 
 * Networking? - set up restheart on a network, connect webserver to network
 * Makes it isolated
+* A usage DB container? With REST API?
 * Volumes
   * Video db volume
   * mongodb config??!
-  * 
+
+
+## DBs
+
+* TIMESTAMP EVERRRRRRRRYYYYTHING
+
+#### Users
+
+* STILL NEED user DB! - Hold the fb data?
+
+#### Graph - recommendations
+
+* This needs to run on:
+  * webserver (users watches film)
+  * new data load from videoprep
+  
+* Neo4j model v0.0.1:
+  * User watched - Node
+  * Film - Node
+    * Director
+    * Actor
+    * Genre
+    * Weightings on the edges for "watched"
+      * number of times watched etc.
+      * higher weigthing for genres already watched
+  * if watched film x - these films might be good to watch
 
 ## Services
 
-* OMDB API - http://www.omdbapi.com/
- * Use the IMDB ID for video_encode and metadata.txt?
- * Then when python wants catalogue data, OMDB call based on ID
- * DEF GETs:
-   * Type (movie/film)/ Poster / Genre / Plot / Duration / Year / Rated / Title
-* Maybe GETs:
-   * Awards / Actors/ Director / Writer / Metascore / imdbRating
-   
-   http://www.omdbapi.com/?i=tt0082971&plot=short&r=json
+#### Videofiles/VideoPrep
+
+* Run on the a seperate docker container?
+  * Volume link to videos folder
+  * Directory hash and mongo put - run through Cron?
+
+* Run in videoprep?
+  * stop dashify when running
+  * cron update rules?
+  * DO:
+    * hold webservice? - or run replica update?
+    * run hashing, update mongodb - can i get replication going?
+    * start dashifying script
+    * if dashifying at 12 am (etc.)
+      * stop dashify.sh
+      * move unprocessed files!!!
+
+#### Users
 
 * Logins db + auth
   * facebook? https://blog.miguelgrinberg.com/post/oauth-authentication-with-flask
@@ -34,19 +69,15 @@
   * paypal? https://developer.paypal.com/docs/classic/payflow/gs_ppa_hosted_pages/
 
 * py video file put mongodb documents - mongodb_data.py
-  * got it to write to json videofile directory
-  * can i get it to do a put/post db?
   * needs to run as a part of videoprep
     * run dashify on todo
     * copy metadate file
     * run mongodb_data.py - with put?
     
-* TV + Season / Film directories?
+* TV + Season / Film directories on webpage?
 
-## DBs
-
-* PostgreSQL - Login db?
 
 ## Webserver
 
 * Use docker ENV variables to set the Video API IP to the one in /etc/hosts of container (restpy linked container)
+* Mongo DB IP needed by both the webserver and the mongo db put script

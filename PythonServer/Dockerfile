@@ -2,11 +2,10 @@
 # Server files mapped as volume on run
 # map to /home/server
 
-FROM tiangolo/uwsgi-nginx-flask:latest
+FROM tiangolo/uwsgi-nginx-flask
 MAINTAINER dijksterhuis "mrobeson@dundee.ac.uk"
 RUN apt-get update
-RUN apt-get --upgrade install -y tar git curl nano wget dialog net-tools python-pip python-dev build-essential python-distribute
+RUN apt-get --upgrade install -y tar git nmap curl nano wget dialog net-tools python-pip python-dev build-essential python-distribute
 RUN pip install --upgrade pip virtualenv flask requests
 RUN rm /app/*
 RUN cd /app
-EXPOSE 90

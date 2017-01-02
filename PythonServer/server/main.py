@@ -1,6 +1,12 @@
 from flask import \
 Flask, render_template, redirect, url_for, request, session, flash
 
+from flask.ext.sqlalchemy import SQLAlchemy
+
+from flask.ext.login import LoginManager,UserMixin
+
+
+
 from functools import \
 wraps
 
@@ -23,6 +29,59 @@ nav_links=["/"\
 
 # create the application object
 app = Flask(__name__)
+
+db = SQLAlchemy(app)
+lm=LoginManager(app)
+
+class User(UserMixin, db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    social_id = db.Column(db.String(64), nullable=False, unique=True)
+    nickname = db.Column(db.String(64), nullable=False)
+    email = db.Column(db.String(64), nullable=True)
+	
+@lm.user_loader
+def load_user(id):
+    return User.query.get(int(id))
+
+
+class OAuthSignIn(object):
+    providers = None
+
+    def __init__(self, provider_name):
+        self.provider_name = provider_name
+        credentials = current_app.config['OAUTH_CREDENTIALS'][provider_name]
+        self.consumer_id = credentials['id']
+        self.consumer_secret = credentials['secret']
+
+    def authorize(self):
+        pass
+
+    def callback(self):
+        pass
+
+    def get_callback_url(self):
+        return url_for('oauth_callback', provider=self.provider_name,
+                       _external=True)
+
+    @classmethod
+    def get_provider(self, provider_name):
+        if self.providers is None:
+            self.providers = {}
+            for provider_class in self.__subclasses__():
+                provider = provider_class()
+                self.providers[provider.provider_name] = provider
+        return self.providers[provider_name]
+
+class FacebookSignIn(OAuthSignIn):
+    pass
+
+app.config['OAUTH_CREDENTIALS'] = {
+    'facebook': {
+        'id': '1350932591605236',
+        'secret': '3c5508e78852ec32c164cc3bd27a7e0b'
+    }}
+
 
 # use a random key generator (form seperate config file)
 app.secret_key= "my precious" 

@@ -1,16 +1,17 @@
 ## Docker
 
 * Networking? - set up restheart on a network, connect webserver to network
-* Makes it isolated
+  * Makes it isolated
 * A usage DB container? With REST API?
 * Volumes
   * Video db volume
   * mongodb config??!
 
-
 ## DBs
 
 * TIMESTAMP EVERRRRRRRRYYYYTHING
+* NEO 4J!
+* Admin passwords ALL need to change
 
 #### Users
 

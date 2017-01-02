@@ -1,32 +1,46 @@
 # This is a script to add movie data to the neo4J db
-import sys
-from py2neo import Graph,Node,Relationship
-import os
-import json
-import requests
+# currently i'ts adding both user, movie AND the fact it's watched.
+# i need to modify it to only add the nodes.
+# then the pyserver is the one that will need to create relationships based on node data
 
+from py2neo import Graph,Node,Relationship
+import os, json, requests, sys
+
+def txCreate(obj):
+	
+	g = Graph("http://localhost:7474",password='admin')
+	tx = g.begin()
+	tx.create(obj)
+	tx.commit()
+	
 def UserWatched(userid,filmid):
 
 	import datetime
 	
 	# define what things are
 
-	g = Graph("http://localhost:7474",password='admin')
+	#MATCH (node:Label) RETURN node.property
+
+	#match (Film) RETURN (Film.filmid)
+
+	# i will need to "get" these from neo4j, right?..
+
 	a = Node("User",userid=userid)
 	b = Node("Film",filmid=filmid)
 	ab = Relationship(a,"WATCHED",b,date=str(datetime.datetime.now()))
 	
-	# put the things
+	txCreate(ab)
 	
-	tx = g.begin()
-	tx.create(a)
-	tx.create(b)
-	tx.create(ab)
+def AddVideos(video_id,video_type,director)
 	
-	# commit the puts
-	
-	tx.commit()
+	video = Node("Video",video_id=video_id,video_type=video_type,director=director)
+	txCreate(video)
 
+def AddUsers(user_id):
+	
+	user = Node("User",user_id=user_id)
+	txCreate(user)
+	
 
 _BASE_URL = "http://localhost:90" # CHANGEIT
 VIDEO_HEADERS = {'Content-type': 'application/hal+json', 'Accept': '*/*'}

@@ -10,7 +10,7 @@ post_resource, get_resource, put_resource, get_omdb
 from video_api import \
 _BASE_URL
 
-from funcs import unique
+from funcs import unique, populate_cat, s
 
 import json
 
@@ -45,7 +45,12 @@ def films_cat():
 	
 	if request.method == 'POST':
 	
-		# todo PUT to usage database
+		# todo ADD TO NEO4J
+		# how to do increased counts?
+		# keep as datetime relationships?
+		# I proabably want to change the back-end id on the page
+		# instead of video name hidden value have extra hidden one
+		# for id - i.e. tt23597234
 	
 		print(request.form['URL'])
 		return render_template(\
@@ -58,19 +63,14 @@ def films_cat():
 	
 	else:
 		
-		payloadmovie=get_resource(_BASE_URL+'/movie',params=None).json()
-		movie_json=payloadmovie['_embedded']['rh:coll']
-		
-		filmlist=[movie_json[i]['_id'] for i,j in enumerate(movie_json)]
-		
-		film_metadata={i:[get_resource(_BASE_URL+'/movie/'+str(i),params=None)\
-		.json()['_embedded']['rh:doc'][0]] for i in filmlist}
+		data=populate_cat('/movie')
 		
 		return render_template(\
 		'/catalogue/films.html'\
-		,video_data=film_metadata\
 		,Page_Name="Catalogue - Films"\
-		,nav_links=nav_links[2:6])
+		,nav_links=nav_links[2:6]\
+		,video_data=data\
+		)
 
 
 # use decorators to link the function to a url
@@ -80,7 +80,14 @@ def tv_cat():
 	
 	if request.method == 'POST':
 
-		# todo PUT to usage database
+		title = request.form['VIDEO TITLE']
+
+		# todo ADD TO NEO4J
+		# how to do increased counts?
+		# keep as datetime relationships?
+		# I proabably want to change the back-end id on the page
+		# instead of video name hidden value have extra hidden one
+		# for id - i.e. tt23597234
 
 		print(request.form['URL'])
 		return render_template(\
@@ -93,25 +100,14 @@ def tv_cat():
 	
 	else:
 
-		# this is only brining back video data for one series title
-		# does the put in mondodb_data.py need to be changed?
-
-		series_metadata=get_resource(\
-		_BASE_URL+'/episode'\
-		,params=None).json()
-
-		hello=series_metadata['_embedded']['rh:coll']
-		tv_list=[hello[i]['_id'] for i,j in enumerate(hello)]
-
-		tv_metadata={i:[get_resource(_BASE_URL+'/episode/'+str(i)\
-		,params=None).json()['_embedded']['rh:doc'][0]] for i in tv_list}
+		data=populate_cat('/episode')
 		
 		return render_template(\
 		'/catalogue/catalogue.html'\
-		,series=tv_list\
-		,video_data=tv_metadata\
 		,Page_Name="Catalogue - TV Shows"\
-		,nav_links=nav_links[2:6])
+		,nav_links=nav_links[2:6]\
+		,video_data=data[0],series=data[1]\
+		)
 
 # route for handling the login page logic
 @app.route('/', methods=['GET', 'POST'])
@@ -129,7 +125,7 @@ def login():
 			
 			session['logged_in'] = True
 			flash('You have been logged in')
-			return redirect(url_for('catalogue'))
+			return redirect(url_for('films_cat'))
 			
 	return render_template('/users/login.html'\
 	,error=error\
@@ -174,7 +170,6 @@ def account():
 	'/users/account.html'\
 	,Page_Name="Account Settings"\
 	,nav_links=nav_links[2:5])  # render a template
-
 
 # start the server with the 'run()' method
 if __name__ == '__main__':

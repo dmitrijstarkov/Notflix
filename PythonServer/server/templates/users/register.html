@@ -3,11 +3,17 @@
 
       <h1>Registration</h1>
       <p>Please enter a username and a *<a href="https://itservices.uchicago.edu/page/good-password-practices"><b>secure</b></a>* password:<p>
+
       <form action="" method="post">
-        <input type="text" placeholder="Username" name="username" value="{{
-          request.form.username }}">
-         <input type="password" placeholder="Password" name="password" value="{{
+        
+        <input type="email" placeholder="your@email.com" name="reg-email" value="{{
+          request.form.email }}">
+       <input type="password" placeholder="Password" name="reg-password" value="{{
           request.form.password }}">
+          
+          <input type="text" placeholder="Age" name="reg-age" value="{{
+            request.form.text }}">
+              
         <input class="btn btn-default" type="submit" value="Register">
       </form>
 

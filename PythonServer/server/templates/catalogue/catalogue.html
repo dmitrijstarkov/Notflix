@@ -1,39 +1,39 @@
 {% extends "base.html" %}
 {% block content %}
 
-    {% block head %}
-    {{super()}}
-    {% endblock %}
-      <br>
-      
-      {% for i,j in video_data.items() %}
-      
-      <h3>{{i}}</h3>
-      
-      <div class ="cat-vid container">
+{% block head %}
+{{super()}}
+{% endblock %}
+<br>
 
-            <h4>season/episode:  {{j[0].items()[8][1]}}/{{j[0].items()[14][1]}}</h4>
+{% for i,j in video_data.items() %}
 
-      <br>
-      <form action="tv_shows" method="post">
-      <input type="hidden" name="URL" value="{{j[0].items()[18][1]}}">
-      <input type="hidden" name="VIDEO TITLE" value="{{j[0].items()[2][1]}}">
-      <input class="btn-default" type="submit" value="WATCH: {{j[0].items()[2][1]}}">
-      </form>
-      
-      <br>
-            <p><b>Description:</b> {{j[0].items()[0][1]}}</p>
-            <p><b>Genre:</b> {{j[0].items()[12][1]}} /// 
-              
-              <b>Runtime:</b>
-              
-               {{j[0].items()[19][1]}} /// <b>imdb Rating:</b> {{j[0].items()[13][1]}}</p> 
-            <p></p>
-      <br>     
+<div class ="cat-vid-container">
 
-      
-    </div>
-      
-      {% endfor %}
-      
+
+<img src="{{j[0].items()[8][1]}}" style="width:192px;height:320px;float:left;margin:0 20px 0 75px;">
+
+<h3>{{i}}</h3>
+
+<form action="tv_shows" method="post">
+  <input type="hidden" name="SERIES TITLE" value="{{i}}">
+  <input type="hidden" name="SERIES-TF" value="True">
+  <input class="btn-watch" type="submit" value="View available episodes">
+</form>
+
+<br>
+
+<p><b>Description:</b> {{j[0].items()[0][1]}}</p>
+<p><b>Rating:</b> {{j[0].items()[1][1]}}</p>  
+<p><b>Genre:</b> {{j[0].items()[12][1]}}</p>
+<p><b>Runtime:</b> {{j[0].items()[16][1]}}</p>
+<p><b>imdb Rating:</b> {{j[0].items()[19][1]}}</p>
+<p><b>Awards:</b> {{j[0].items()[11][1]}}</p>
+
+<br>
+</div>
+<br>
+<br><br>
+
+{% endfor %}      
 {% endblock %}

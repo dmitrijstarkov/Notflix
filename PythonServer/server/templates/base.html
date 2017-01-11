@@ -1,77 +1,148 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    {% block head %}
-    <title>{{Page_Name}}</title>
-    {% endblock %}
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="static/bootstrap.min.css" rel="stylesheet" media="screen">
-    <style>
-    #navmenu ul {background: grey; margin: 10px; padding: 10px; 
-    	list-style-type: none; list-style-image: none; }
-    #navmenu li {display: inline; padding: 10px 75px 5px 20px}
-    #navmenu a {text-decoration:none; color: white; }
-    #navmenu a:hover {color: orange;}
-    .btn-lg {
-      
-      background-color: white;
-      color: blue;
-      border-color: none;
-      border-radius: 5px;
-      font-size: xx-large;
-      }
-    
-    .btn-block {
+
+<head>
   
-      background-color: white;
-      color: blue;
-      border-color: none;
-      border-radius: 5px;
-      font-size: xx-large;
+{% block head %}
+
+<title>
+  {{Page_Name}}
+</title>
+
+{% endblock %}
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<style>
+
+body {
+    background-color: rgb(20,20,20);
+}
+
+h1 {
+    color: white;
+}
+
+h2 {
+    color: white;
+}
+h3 {
+    color: white;
+}
+h4 {
+    color: white;
+}
+
+p {
+    color: white;
+}
+
+#navmenu ul 
+{
+  background: grey; 
+  margin: 10px; 
+  padding: 10px; 
+	list-style-type: none;
+  list-style-image: none; 
+}
+
+#navmenu li {display: inline; padding: 10px 75px 5px 20px}
+#navmenu a {text-decoration:none; color: white; }
+#navmenu a:hover {color: orange;}
+
+.btn-lg 
+  {
+  background-color: white;
+  color: blue;
+  border-color: none;
+  border-radius: 5px;
+  font-size: xx-large;
+  }
+
+.btn-block 
+  {
+  background-color: white;
+  color: blue;
+  border-color: none;
+  border-radius: 5px;
+  font-size: xx-large;
+  }
+
+.btn-default 
+  {
+  background-color: grey;
+  color: white;
+  border-color: none;
+  border-radius: 0px;
+  font-size: x-large;
+  }
+  
+.btn-default2 
+  {
+  background-color: grey;
+  size: large;
+  color: white;
+  border-color: none;
+  border-radius: 0px;
+  font-size: large;
+  }
+
+  .btn-watch 
+    {
+    background-color: black;
+    size: large;
+    color: white;
+    border-color: none;
+    border-radius: 0px;
+    font-size: large;
     }
-    
-    .btn-default {
 
-        background-color: white;
-        color: blue;
-        border-color: none;
-        border-radius: 5px;
-        font-size: xx-large;
-      }
-    
-    
-    </style>
-    
+#cat-vid-container 
+  {
+  background-color: white;
+  color: blue;
+  border-color: none;
+  border-radius: 5px;
+  padding: 10px 75px 5px 20px;
+  }
 
-  </head>
-  <body>
-    <div id="navmenu">
+</style>
+</head>
+
+<body>
+  <div id="navmenu">
     <ul>
-      
       {% for link in nav_links %}
-      
     	<li><a href="{{link}}">{{link}}</a></li>
-      
       {% endfor %}
-      
     </ul>
-    </div>
+  </div>
 
-    <div class="container">
-      <br>
-      <!-- messages -->
-      {% for message in get_flashed_messages() %}
+  <div class="container">
+  <br>
+    <!-- messages -->
+    {% for message in get_flashed_messages() %}
+    <p>{{ message }}</p>
+    {% endfor %}
+  <br>
+    <!-- child template -->
+    {% block content %}{% endblock %}
+  <br>
+    <!-- errors -->
+    {% if error %}
+    <p class="error"><strong>Error:</strong> {{ error }}</p>
+    {% endif %}
+  </div>
+  
+</body>
 
-        {{ message }}
-      {% endfor %}
-        <br>
-      <!-- child template -->
-      {% block content %}{% endblock %}
-      <br>
-      <!-- errors -->
-      {% if error %}
-        <p class="error"><strong>Error:</strong> {{ error }}</p>
-      {% endif %}
-    </div>
-  </body>
 </html>

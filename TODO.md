@@ -1,31 +1,74 @@
-## Docker
+## MUST DO
+
+* change / !!SET UP!! admin passwords!
+
+* Welcome page? - site logo?
+
+* Account page!!
+
+* redis - what else can I use this for? so easy to set up!!
+  * write usage db to mysql on session close? or mongo?
+  * 
+  
+* mysql - subscription table!!
+  * session subscriptions check (dependant on mysql)
+  * CHANGE THE SESSSION VALUES!!
+
+* finalise Dockerfiles for builds
+
+* JENKINS!
+
+* paypal check!
+  * does payment work?
+  * can I put the data to mysql?
+  * should I have a seperate db ?
+
+
+## NICE TO HAVE
+
+* mysql - user details??
+  * Paypal login?
+  
+* film ratings??
+
+* Neo4j - recommendations
+ * user history - from the redis store?
+ * user recommendation page?
+   * use carousel - py script input
+   * can use redis to store "SCORED SETS"
+
+* docker networks
+
+* docker swarm mode
+
+* logs files from all the python scripts?
+
+______________
+
+### Docker
 
 * Networking? - set up restheart on a network, connect webserver to network
   * Makes it isolated
-* A usage DB container? With REST API?
-* Volumes
-  * Video db volume
-  * mongodb config??!
+  * SET IP ADDRESSES TO BE STATIC
+* Payapl transaction details 
 
-## DBs
+### DBs
 
-* TIMESTAMP EVERRRRRRRRYYYYTHING
+* TIMESTAMPS
 * NEO 4J!
 * Admin passwords ALL need to change
 
-#### Users
-
-* STILL NEED user DB! - Hold the fb data?
+### Services
 
 #### Graph - recommendations
 
-* This needs to run on:
+* This needs to run based on from:
   * webserver (users watches film)
   * new data load from videoprep
   
 * Neo4j model v0.0.1:
-  * User watched - Node
-  * Film - Node
+  * Users Node
+  * Film Nodes
     * Director
     * Actor
     * Genre
@@ -34,51 +77,34 @@
       * higher weigthing for genres already watched
   * if watched film x - these films might be good to watch
 
-## Services
+* when films added, add a film node - videoprep
+* when user registers in, add a user node - pyserving
 
 #### Videofiles/VideoPrep
-
-* Run on the a seperate docker container?
-  * Volume link to videos folder
-  * Directory hash and mongo put - run through Cron?
 
 * Run in videoprep?
   * stop dashify when running
   * cron update rules?
   * DO:
-    * hold webservice? - or run replica update?
-    * run hashing, update mongodb - can i get replication going?
-    * start dashifying script
-    * if dashifying at 12 am (etc.)
-      * stop dashify.sh
-      * move unprocessed files!!!
+    * iterate through ONLY todo folder (need to add this)
+    * start dashifying script for each new folder
+    * run hashing, update mongodb
+    * mongo script only puts NEW dox from todo, so nothing gets overwritten
 
 #### Users
 
-* Logins db + auth
-  * facebook? https://blog.miguelgrinberg.com/post/oauth-authentication-with-flask
-  * db https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-v-user-logins
-  * db2 (vid) https://www.youtube.com/watch?v=_vrAjAHhUsA
-
+* e-mail confirmations? Flask-Mail?
+  
 * Registration
-  * fb?
-  * db?
+  * send to purchase page
+  * if not completed purchase, drop from database
 
-* Account settings
+* Account settings - password change, email change
 
 * Payment
   * paypal? https://developer.paypal.com/docs/classic/payflow/gs_ppa_hosted_pages/
 
-* py video file put mongodb documents - mongodb_data.py
-  * needs to run as a part of videoprep
-    * run dashify on todo
-    * copy metadate file
-    * run mongodb_data.py - with put?
-    
-* TV + Season / Film directories on webpage?
-
-
-## Webserver
+#### Webserver
 
 * Use docker ENV variables to set the Video API IP to the one in /etc/hosts of container (restpy linked container)
 * Mongo DB IP needed by both the webserver and the mongo db put script

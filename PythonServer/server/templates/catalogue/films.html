@@ -8,27 +8,34 @@
       
       {% for i,j in video_data.items() %}
       
-      <h3>{{i}}</h3>
-      <div class ="cat-vid container">
 
-      <br>
+      <div class ="cat-vid-container">
+      
+      <img src="{{j[0].items()[7][1]}}" 
+        style="width:192px;height:320px;float:left;margin:0 20px 0 75px;">
+      
+      
+      <h3>{{i}}</h3>
+      
       <form action="films" method="post">
       <input type="hidden" name="URL" value="{{j[0].items()[15][1]}}">
       <input type="hidden" name="VIDEO TITLE" value="{{i}}">
-      <input class="btn-default" type="submit" value="WATCH: {{i}}">
+      <input type="hidden" name="video_id" value="{{j[0].items()[17][1]}}">
+      <input class="btn-watch" type="submit" value="Watch this">
       </form>
       
       <br>
-            <p><b>Description:</b> {{j[0].items()[0][1]}}</p>
-            <p><b>Genre:</b> {{j[0].items()[11][1]}} /// 
-              
-              <b>Runtime:</b>
-              
-               {{j[0].items()[16][1]}} /// <b>imdb Rating:</b> {{j[0].items()[19][1]}}</p> 
-            <p></p>
-      <br>     
-
+        <p><b>Description:</b> {{j[0].items()[0][1]}}</p>
       
+        <p><b>Rated:</b> {{j[0].items()[11][1]}} </p>
+        <p><b>Genre:</b> {{j[0].items()[11][1]}} </p>
+        <p><b>Runtime:</b>{{j[0].items()[16][1]}} </p>
+        <p><b>imdb Rating:</b> {{j[0].items()[19][1]}} </p>
+
+
+      <br><br><br><br>
+
+
     </div>
       
       {% endfor %}

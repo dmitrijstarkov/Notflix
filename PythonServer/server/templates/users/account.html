@@ -1,4 +1,51 @@
 {% extends "base.html" %}
 {% block content %}
-<p>This is where you will change your account details</p>
+<h1>Account Details</h1>
+<br>
+
+<h3>E-mail address</h3>
+
+<p>Your current email address is: Current email</p>
+
+<p>Do you want to change your current email address? </p>
+
+<form action="" method="post">
+<input type="email" placeholder="your@email.com" name="reg-email" value="{{request.form.email }}">
+<br>
+<br>
+<input class="btn btn-default2" type="submit" value="Change e-mail">
+</form>
+
+<br><br>
+
+<h3>Password</h3>
+
+<p>Want to change your password? Please make sure it is *<a href="https://itservices.uchicago.edu/page/good-password-practices"><b>secure</b></a>*</p>
+
+<form action="" method="post">
+<input type="password" placeholder="Old Password" name="reg-password-old" value="{{request.form.password }}">
+<br><br>
+<input type="password" placeholder="New Password" name="reg-password-new" value="{{request.form.password }}">
+<br><br>
+<input type="password" placeholder="Repeat New Password" name="reg-password-newrepeat" value="{{request.form.password}}">
+<br><br>
+<input class="btn btn-default2" type="submit" value="Change Password">
+</form>
+
+<br>
+
+<h1>Payment Details</h1>
+<br>
+
+<p>You have paid x this month</p>
+<p>Your paypal account is listed as: xxxx</p>
+
+
+
+
+
+
+
+
+
 {% endblock %}

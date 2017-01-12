@@ -1,8 +1,6 @@
 ## TODOs
 # --------------------------------------------------
 
-# Mysql - do it according to python programming
-# Dashboard the film / tv categories??
 # DO the recommendations
 
 # --------------------------------------------------
@@ -10,28 +8,24 @@
 # python modules
 
 from flask import Flask, render_template, redirect, url_for, request, session, flash
-from flask_sqlalchemy import SQLAlchemy
-from flaskext.mysql import MySQL
-#from MySQLdb import escape_string as thwart
 from werkzeug import generate_password_hash, check_password_hash
 from werkzeug.datastructures import ImmutableOrderedMultiDict
-import json, os, requests,datetime
+import json, os, requests, datetime
 
 # --------------------------------------------------
 
 # my modules
 
 from funcs import \
-populate_cat, s, nav_links, login_required, subscription_required, populate_eps, login_attempts_numb, login_attempts_incr, usage_hist
+populate_cat, s, nav_links, login_required, subscription_required \
+, populate_eps, login_attempts_numb, login_attempts_incr, usage_hist \
+, login_check, registration_check, ipn_validation, put_payment, put_sub
 
-from mysql_config import \
-mysql_user, mysql_ps, mysql_db, mysql_host, mysql_port
 
 from client_messages import \
-login_error, reg_error, login_success, logout_success,\
-reg_forms_error, registered_success, login_noreg_error, too_many_too_many_attempts,\
-no_email_error, no_password_error
-
+login_error, reg_error, login_success, logout_success\
+, reg_forms_error, registered_success, login_noreg_error\
+, too_many_too_many_attempts, no_email_error, no_password_error
 
 # --------------------------------------------------
 
@@ -41,31 +35,16 @@ app = Flask(__name__)
 
 # --------------------------------------------------
 
-# MySQL configurations
-# THIS IS GOING TO CHANGE!
-
-mysql = MySQL() 
-app.config['MYSQL_DATABASE_USER'] = mysql_user
-app.config['MYSQL_DATABASE_PASSWORD'] = mysql_ps
-app.config['MYSQL_DATABASE_DB'] = mysql_db
-app.config['MYSQL_DATABASE_HOST'] = mysql_host
-app.config['MYSQL_DATABASE_PORT'] = mysql_port
-mysql.init_app(app)
-conn = mysql.connect()
-cursor = conn.cursor()
-
-# --------------------------------------------------
-
 # Super secret sesion key
 
 app.secret_key=generate_password_hash(os.urandom(24))
 
 # --------------------------------------------------
 
-# app routes (pages etc.)
+# app routes (pages and fucntions applied to server data etc.)
 
 @app.route('/films',methods=['GET','POST'])
-@login_required
+#@login_required
 #@subscription_required
 def films_cat():
 	
@@ -91,7 +70,7 @@ def films_cat():
 		,nav_links=nav_links[2:7],video_data=data)
 
 @app.route('/tv_shows',methods=['GET','POST'])
-@login_required
+#@login_required
 #@subscription_required
 def tv_cat():
 
@@ -142,16 +121,15 @@ def login():
 		if email \
 		and password \
 		and login_tries < 5:
-
-			cursor.callproc('sp_login16',(email,password))
-			mysqldata = cursor.fetchall()
-			lsql = len(mysqldata)
+				
+			mysqldata=login_check(email,password)
+			login_lsql = len(mysqldata)
 		
-			if lsql == 0:
+			if login_lsql == 0:
 			
 				error = login_noreg_error
 			
-			elif lsql > 0 \
+			elif login_lsql > 0 \
 			and check_password_hash(mysqldata[0][1],password) == True:
 			
 				session['logged_in'] = True
@@ -164,7 +142,7 @@ def login():
 		
 				return redirect(url_for('films_cat'))			
 
-			elif lsql > 0 \
+			elif login_lsql > 0 \
 			and check_password_hash(mysqldata[0][1],password) == False :
 
 				login_attempts_incr(email)
@@ -210,18 +188,16 @@ def register():
 	if request.method == 'POST':
 		
 		email,password,age =\
-		 request.form['reg-email']\
-		 ,request.form['reg-password']\
-		 ,request.form['reg-age']
+		 str(request.form['reg-email'])\
+		 ,str(request.form['reg-password'])\
+		 ,str(request.form['reg-age'])
 		
 		if email and password and age:
 			
 			hashedpassword = generate_password_hash(password)
-			cursor.callproc('sp_createUser3',(email,hashedpassword))
-
-			if len(cursor.fetchall()) == 0:
-				
-				conn.commit()
+			reg_check = registration_check(email,hashedpassword)
+			
+			if reg_check == True:
 				session['logged_in'] = True
 				session['subscription']='Inactive'
 				flash(s(registered_success) + s(email))
@@ -250,46 +226,71 @@ def purchase():
 
 @app.route('/ipn',methods=['POST'])
 def ipn():
-	arg = ''
+	
+	#arg = ''
 	request.parameter_storage_class = ImmutableOrderedMultiDict
-	values = request.form
-	for x, y in values.iteritems():
-		arg += "&{x}={y}".format(x=x,y=y)
+	#values = request.form
 
-	validate_url = 'https://www.sandbox.paypal.com' \
-				   '/cgi-bin/webscr?cmd=_notify-validate{arg}' \
-				   .format(arg=arg)
+
+	#for x, y in values.iteritems():
+	#	arg += "&{x}={y}".format(x=x,y=y)
+	#
+	#validate_url = 'https://www.sandbox.paypal.com' \
+	#			   '/cgi-bin/webscr?cmd=_notify-validate{arg}' \
+	#			   .format(arg=arg)
 				   
-	r = requests.get(validate_url)
-	print(r.text)
-	if r.text == 'VERIFIED':
-		# non thwart version
-		print(request.form)
-		payer_email =  request.form.get('payer_email')
-		unix = datetime.datetime.now()
-		payment_date = request.form.get('payment_date')
-		username = request.form.get('custom')
-		last_name = request.form.get('last_name')
-		payment_gross = request.form.get('payment_gross')
-		payment_fee = request.form.get('payment_fee')
-		payment_status = request.form.get('payment_status')
+	#r = requests.get(validate_url)
+
+	#print(r.text)
+	
+	ipn_validation(request.form)
+	
+	if request.form.get('txn_type') == 'subscr_signup':
+		
+		print('putting stuff to the subscriptions db')
+		
+		sub_id = request.form.get('subscr_id')
+		date = datetime.datetime.now()
+		user_id = request.form.get('custom')
+		ipn_id = request.form.get('ipn_track_id')
+		paypal_email = request.form.get('payer_email')
+		payer_id = request.form.get('payer_id')
+		
+		#cursor.callproc('sp_createUser3',(email,hashedpassword))
+		
+		put_payment(\
+		sub_id\
+		,date\
+		,user_id\
+		,ipn_id\
+		,paypal_email\
+		,payer_id)
+		
+	elif request.form.get('txn_type') == 'subscr_payment':
+		
+		print('put stuff to the payments db')	
+
+		sub_id = request.form.get('subscr_id')
+		date = datetime.datetime.now()
+		user_id = request.form.get('custom')
+		ipn_id = request.form.get('ipn_track_id')
+		verif_id = request.form.get('verify_sign')
+		amount = request.form.get('payment_gross')
+		status = request.form.get('payment_status')
 		txn_id = request.form.get('txn_id')
+		#cursor.callproc('sp_createUser3',(email,hashedpassword))
 		
-		# thwart version
-		
-		#payer_email =  thwart(request.form.get('payer_email'))
-		#unix = int(time.time())
-		#payment_date = thwart(request.form.get('payment_date'))
-		#username = thwart(request.form.get('custom'))
-		#last_name = thwart(request.form.get('last_name'))
-		#payment_gross = thwart(request.form.get('payment_gross'))
-		#payment_fee = thwart(request.form.get('payment_fee'))
-		#payment_net = float(payment_gross) - float(payment_fee)
-		#payment_status = thwart(request.form.get('payment_status'))
-		#txn_id = thwart(request.form.get('txn_id'))
+		put_sub(\
+		sub_id\
+		,date\
+		,user_id\
+		,ipn_id \
+		,verif_id\
+		,amount\
+		,status\
+		,txn_id)
 
-	return r.text
-
+	return 'hello'
 
 @app.route('/success')
 @login_required

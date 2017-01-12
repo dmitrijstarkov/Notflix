@@ -2,7 +2,7 @@
 # Global constants for REST calls #
 # ------------------------------- #
 
-_BASE_URL = "http://172.17.0.3:8080" # THIS CAN CHANGE!!!
+_BASE_URL = "http://video-rest:8080" # THIS CAN CHANGE!!!
 _DATABASE = '/videos'
 VIDEO_DATABASE_URL = _BASE_URL + _DATABASE
 TV = VIDEO_DATABASE_URL + "/episode"

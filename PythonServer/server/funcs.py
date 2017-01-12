@@ -1,4 +1,4 @@
-import json, redis, datetime
+import json, redis, datetime, MySQLdb, requests
 from functools import wraps
 from flask import session, flash, redirect, url_for
 
@@ -7,8 +7,16 @@ post_resource, get_resource, put_resource, get_omdb
 
 from video_api import _BASE_URL
 
+from mysql_config import \
+logins_conn, payments_conn, subs_conn, logins_cursor, payments_cursor, subs_cursor
+
 r_login_attempts = redis.Redis(host='172.17.0.6',port='6379')
 r_usage = redis.Redis(host='172.17.0.9',port='6379')
+
+
+logins_cursor = logins_conn.cursor()
+payments_cursor = payments_conn.cursor()
+subs_cursor = subs_conn.cursor()
 
 nav_links=["/"\
 ,"/register"\
@@ -84,3 +92,55 @@ def login_attempts_numb(string):
 def usage_hist(str1,str2):
 	
 	r_usage.lpush(str1,str2)
+	
+def login_check(str1,str2):
+	
+	logins_cursor.callproc('sp_login16',(str1,str2))
+	data = logins_cursor.fetchall()
+	
+	return data
+	
+def registration_check(str1,str2):
+	
+	logins_cursor.callproc('sp_createUser3',(str1,str2))
+	data = len(logins_cursor.fetchall())
+	
+	if data == 0:
+		logins_conn.commit()
+		return True
+	
+	else:
+		return False
+	
+def registration_put(str1,str2):
+	
+	logins_cursor.callproc('sp_createUser3',(str1,str2))
+	logins_conn.commit()
+	
+def ipn_validation(input1):
+	
+	arg = ''
+	
+	for x, y in input1.iteritems():
+		arg += "&{x}={y}".format(x=x,y=y)
+
+	validate_url = 'https://www.sandbox.paypal.com' \
+				   '/cgi-bin/webscr?cmd=_notify-validate{arg}' \
+				   .format(arg=arg)
+				   
+	r = requests.get(validate_url)
+	
+	print(r.text)
+	
+	return r.text
+	
+def put_payment(in1,in2,in3,in4,in5,in6):
+	
+	payments_cursor.callproc('sp_createPayment',(in1,in2,in3,in4,in5,in6))
+	payments_conn.commit()
+		
+def put_sub(in1,in2,in3,in4,in5,in6,in7,in8):
+	
+	subs_cursor.callproc('sp_createSub',(in1,in2,in3,in4,in5,in6))
+	subs_conn.commit()
+	

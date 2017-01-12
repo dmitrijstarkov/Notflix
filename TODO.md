@@ -1,14 +1,18 @@
 ## MUST DO
 
-* change / !!SET UP!! admin passwords!
-
-* Welcome page? - site logo?
+* !!!!!!!! change / SET UP new admin passwords!
 
 * Account page!!
 
-* redis - what else can I use this for? so easy to set up!!
-  * write usage db to mysql on session close? or mongo?
-  * 
+* paypal check!
+  * does payment work?
+  * can I put the data to mysql?
+  * should I have a seperate db ?
+
+* PURCHASE PAGE
+  * the ngrok domain needs to be setup
+  * ENV variables?
+  * sign up and have a static domain?
   
 * mysql - subscription table!!
   * session subscriptions check (dependant on mysql)
@@ -18,13 +22,13 @@
 
 * JENKINS!
 
-* paypal check!
-  * does payment work?
-  * can I put the data to mysql?
-  * should I have a seperate db ?
-
 
 ## NICE TO HAVE
+
+* redis - what else can I use this for? so easy to set up!!
+  * write usage db to mysql on session close? or mongo?
+
+* Welcome page? - site logo?
 
 * mysql - user details??
   * Paypal login?

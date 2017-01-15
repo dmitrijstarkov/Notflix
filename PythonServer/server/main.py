@@ -10,33 +10,53 @@
 from flask import Flask, render_template, redirect, url_for, request, session, flash
 from werkzeug import generate_password_hash, check_password_hash
 from werkzeug.datastructures import ImmutableOrderedMultiDict
-import json, os, requests, datetime
+import json, os, datetime, time
 
 # --------------------------------------------------
 
 # my modules
 
 from funcs import \
-populate_cat, s, nav_links, login_required, subscription_required \
-, populate_eps, login_attempts_numb, login_attempts_incr, usage_hist \
-, login_check, registration_check, ipn_validation, put_payment, put_sub
+s\
+, logged_in_navs\
+, no_login_navs\
+, login_required\
+, subscription_required \
+, omdb
+
+from video_api_funcs import  populate_cat, populate_eps
+
+from redis_funcs import\
+login_hist_get\
+, login_hist_add\
+, count_usage\
+, get_usage\
+, usage_hist\
+, login_attempts_numb\
+, login_attempts_incr
+
+from mysql_funcs import \
+numbs_pass\
+, update_password\
+, get_sub_dets\
+, get_all_payments\
+, sub_check\
+, put_sub\
+, put_payment\
+, ipn_validation\
+, registration_check\
+, login_check 
+
+from client_messages import error_dict
 
 
-from client_messages import \
-login_error, reg_error, login_success, logout_success\
-, reg_forms_error, registered_success, login_noreg_error\
-, too_many_too_many_attempts, no_email_error, no_password_error
-
+# global stuff
 # --------------------------------------------------
 
 # the app!
-
 app = Flask(__name__)
 
-# --------------------------------------------------
-
-# Super secret sesion key
-
+# Super secret cookie session key
 app.secret_key=generate_password_hash(os.urandom(24))
 
 # --------------------------------------------------
@@ -44,20 +64,20 @@ app.secret_key=generate_password_hash(os.urandom(24))
 # app routes (pages and fucntions applied to server data etc.)
 
 @app.route('/films',methods=['GET','POST'])
-#@login_required
-#@subscription_required
+@login_required
+@subscription_required
 def films_cat():
 	
 	# bring up the videos page for viewing
 	
 	if request.method == 'POST':
-
-		usage_hist(session['user_id'],request.form['video_id'])
+		title = request.form['VIDEO TITLE']
+		usage_hist(session['user_id'],title)
 		
 		return render_template('/videos/video.html'\
-		,link=request.form['URL'],name=request.form['VIDEO TITLE']\
-		,Page_Name=request.form['VIDEO TITLE']\
-		,nav_links=nav_links[2:7],back='/films')
+		,link=request.form['URL'],name=title\
+		,Page_Name=title\
+		,nav_links=logged_in_navs,back='/films')
 	
 	# display the films catalogue	
 	
@@ -67,11 +87,11 @@ def films_cat():
 		
 		return render_template('/catalogue/films.html'\
 		,Page_Name="Catalogue - Films"\
-		,nav_links=nav_links[2:7],video_data=data)
+		,nav_links=logged_in_navs,video_data=data)
 
 @app.route('/tv_shows',methods=['GET','POST'])
-#@login_required
-#@subscription_required
+@login_required
+@subscription_required
 def tv_cat():
 
 	# populate series page
@@ -82,8 +102,7 @@ def tv_cat():
 		
 		return render_template('/catalogue/catalogue.html'\
 		,Page_Name="Catalogue - TV Shows"\
-		,nav_links=nav_links[2:7],video_data=data)
-
+		,nav_links=logged_in_navs,video_data=data)
 	
 	# populate episodes data for carousel
 	
@@ -94,91 +113,122 @@ def tv_cat():
 	
 		return render_template('catalogue/episode-carousel.html'\
 		,name=title,Page_Name=title\
-		,nav_links=nav_links[2:6],video_data=data)
+		,nav_links=logged_in_navs,video_data=data)
 	
 	# bring up the videos page
 	
 	elif request.form['SERIES-TF'] == "False":
 
 		title = request.form['VIDEO TITLE']
-		usage_hist(session['user_id'],request.form['video_id'])
+		usage_hist(session['user_id'],title)
 	
 		return render_template('videos/video.html'\
 		,link=request.form['URL'],name=title\
-		,Page_Name=title,nav_links=nav_links[2:6],back='/tv_shows')
+		,Page_Name=title,nav_links=logged_in_navs,back='/tv_shows')
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
 
-	# what about re-routing people who haven;t got a subscription?
 
 	error = None
 	if request.method == 'POST':
 		
 		email,password=request.form['login-email'],request.form['login-password']
 		login_tries = login_attempts_numb(email)
-		
-		if email \
-		and password \
-		and login_tries < 5:
+	
+		if email and password and login_tries < 5:
 				
 			mysqldata=login_check(email,password)
 			login_lsql = len(mysqldata)
 		
 			if login_lsql == 0:
 			
-				error = login_noreg_error
+				error = error_dict['login_noreg_error']
 			
-			elif login_lsql > 0 \
-			and check_password_hash(mysqldata[0][1],password) == True:
-			
+			elif login_lsql>0 and check_password_hash(mysqldata[0][1],password)==True:
 				session['logged_in'] = True
-			
-				#cheating with subscriptions!!
-			
-				session['subscription'] = "Active"
-				session['user_id'] = mysqldata[0][0]
-				flash(login_success)
-		
+				session['user_id'] = mysqldata[0][0]	
+				lastlogin = login_hist_add(session['user_id'])
+				
+				flash(s(error_dict['login_success'])\
+				 + ' You last logged in '+s(lastlogin))
+				
+				if sub_check(session['user_id']) == True:
+					session['subscription'] = True
+				else:
+					session['subscription'] = False
+
 				return redirect(url_for('films_cat'))			
 
-			elif login_lsql > 0 \
-			and check_password_hash(mysqldata[0][1],password) == False :
+			elif login_lsql>0 and check_password_hash(mysqldata[0][1],password)==False:
 
 				login_attempts_incr(email)
-				error = login_error
+				error = error_dict['login_error']
 		
-		elif email \
-		and password \
-		and login_tries >= 5:
+		elif email and password and login_tries >= 5:
 
 			login_attempts_incr(email)
-			error = too_many_too_many_attempts
-			
+			error = error_dict['too_many_too_many_attempts']
 		elif not email:
-			error = no_email_error
+			error = error_dict['no_email_error']
 						
 		elif not password:
-			error = no_password_error
+			error = error_dict['no_password_error']
 						
 	return render_template('/users/login.html'\
 	,error=error\
-	,Page_Name="Login",nav_links=nav_links[1:2])
+	,Page_Name="Login",nav_links=no_login_navs)
 
 @app.route('/logout')
 @login_required
 def logout():
 
 		session.pop('logged_in',None)
-		flash(logout_success)
+		flash(error_dict['logout_success'])
 		return redirect(url_for('login'))
 
-@app.route('/account')
+@app.route('/account', methods=['GET', 'POST'])
 @login_required
+@subscription_required
 def account():
+	error=None
+	if request.method == 'POST':
+		old_pw,new1,new2,email = request.form['reg-password-old']\
+		, request.form['reg-password-new1'] \
+		, request.form['reg-password-new2']	\
+		, request.form['reg-email']
+			
+		if old_pw and new1 and new2 and email:
+			if new1 == new2:
+				if len(new1) > 8 and numbs_pass(new1) > 2:
+
+					mysqldata=login_check(email,old_pw)
+					
+					if check_password_hash(mysqldata[0][1],old_pw) == True:
+					
+						hashedpassword = generate_password_hash(new1)
+						update_password(session['user_id'],hashedpassword)
+						flash(error_dict['pass_change_success'])
+						
+				else:
+					error =  error_dict['not_long_enough']
+			else:
+				error = error_dict['not_matching_passwords']
+		else:
+			error=error_dict['reg_forms_error']
+
+	user = s(session['user_id'])
+
+	payments = get_all_payments(user)	
+	subs = get_sub_dets(user)
+	last10 = get_usage(user)
+	countvids = count_usage(user)
+	loginhist=login_hist_get(user)
 	
-    return render_template('/users/account.html'\
-	,Page_Name="Account Settings",nav_links=nav_links[2:7])
+	return render_template('/users/account.html'\
+	,Page_Name="Account Settings",nav_links=logged_in_navs\
+	,payments=payments,subs=subs,last10=last10,countvids=countvids\
+	,loginhist=loginhist)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -187,108 +237,75 @@ def register():
 	
 	if request.method == 'POST':
 		
-		email,password,age =\
+		email,password1,password2,age =\
 		 str(request.form['reg-email'])\
-		 ,str(request.form['reg-password'])\
+		 ,str(request.form['reg-password1'])\
+ 		 ,str(request.form['reg-password2'])\
 		 ,str(request.form['reg-age'])
 		
-		if email and password and age:
+		if email and password1 and password2 and age:
+			if password1 == password2:
+				if len(password1) > 8 and numbs_pass(password1) > 2:
+
+					hashedpassword = generate_password_hash(password1)
+					reg_check = registration_check(email,hashedpassword)
 			
-			hashedpassword = generate_password_hash(password)
-			reg_check = registration_check(email,hashedpassword)
-			
-			if reg_check == True:
-				session['logged_in'] = True
-				session['subscription']='Inactive'
-				flash(s(registered_success) + s(email))
-				return redirect(url_for('purchase'))
+					if reg_check == True:
+						mysqldata=login_check(email,password1)
+						session['user_id'] = mysqldata[0][0]
+						session['logged_in'] = True
+						session['subscription'] = False
+						flash(s(error_dict['registered_success']) + s(email))
+						return redirect(url_for('purchase'))
 				
+					else:
+						error = error_dict['reg_error']
+				else:
+					error = error_dict['not_long_enough']
 			else:
-				error = reg_error
+				error = error_dict['not_matching_passwords']
 		else:
-			error = reg_forms_error
+			error = error_dict['reg_forms_error']
 		
 	return render_template('/users/register.html',error=error\
-	,Page_Name="Registration",nav_links=nav_links[0:2])
-
-#### https://pythonprogramming.net/paypal-flask-tutorial/
+	,Page_Name="Registration",nav_links=no_login_navs)
 
 @app.route('/purchase')
 @login_required
 def purchase():
 	
-	#CHEATING!
-	
-	session['subscription']='Inactive'
-	
 	return render_template('/payment/purchase.html'\
-	,Page_Name="Please buy something",nav_links=nav_links[2:7])
+	,Page_Name="Please buy something",nav_links=logged_in_navs)
 
 @app.route('/ipn',methods=['POST'])
 def ipn():
 	
-	#arg = ''
 	request.parameter_storage_class = ImmutableOrderedMultiDict
-	#values = request.form
+	if ipn_validation(request.form) == "VERIFIED":
+		now = datetime.datetime.now()
+		if request.form.get('txn_type') == 'subscr_signup':
+		
+			sub_id = request.form.get('subscr_id')
+			date = now.strftime('%Y-%m-%d %H:%M:%S')
+			user_id = request.form.get('custom')
+			ipn_id = request.form.get('ipn_track_id')
+			paypal_email = request.form.get('payer_email')
+			payer_id = request.form.get('payer_id')
+		
+			put_sub(sub_id,date,user_id,ipn_id,paypal_email,payer_id)
+		
+		elif request.form.get('txn_type') == 'subscr_payment':	
 
-
-	#for x, y in values.iteritems():
-	#	arg += "&{x}={y}".format(x=x,y=y)
-	#
-	#validate_url = 'https://www.sandbox.paypal.com' \
-	#			   '/cgi-bin/webscr?cmd=_notify-validate{arg}' \
-	#			   .format(arg=arg)
-				   
-	#r = requests.get(validate_url)
-
-	#print(r.text)
-	
-	ipn_validation(request.form)
-	
-	if request.form.get('txn_type') == 'subscr_signup':
+			sub_id = request.form.get('subscr_id')
+			date = now.strftime('%Y-%m-%d %H:%M:%S')
+			user_id = request.form.get('custom')
+			ipn_id = request.form.get('ipn_track_id')
+			verif_id = request.form.get('verify_sign')
+			amount = request.form.get('payment_gross')
+			status = request.form.get('payment_status')
+			txn_id = request.form.get('txn_id')
 		
-		print('putting stuff to the subscriptions db')
-		
-		sub_id = request.form.get('subscr_id')
-		date = datetime.datetime.now()
-		user_id = request.form.get('custom')
-		ipn_id = request.form.get('ipn_track_id')
-		paypal_email = request.form.get('payer_email')
-		payer_id = request.form.get('payer_id')
-		
-		#cursor.callproc('sp_createUser3',(email,hashedpassword))
-		
-		put_payment(\
-		sub_id\
-		,date\
-		,user_id\
-		,ipn_id\
-		,paypal_email\
-		,payer_id)
-		
-	elif request.form.get('txn_type') == 'subscr_payment':
-		
-		print('put stuff to the payments db')	
-
-		sub_id = request.form.get('subscr_id')
-		date = datetime.datetime.now()
-		user_id = request.form.get('custom')
-		ipn_id = request.form.get('ipn_track_id')
-		verif_id = request.form.get('verify_sign')
-		amount = request.form.get('payment_gross')
-		status = request.form.get('payment_status')
-		txn_id = request.form.get('txn_id')
-		#cursor.callproc('sp_createUser3',(email,hashedpassword))
-		
-		put_sub(\
-		sub_id\
-		,date\
-		,user_id\
-		,ipn_id \
-		,verif_id\
-		,amount\
-		,status\
-		,txn_id)
+			put_payment(sub_id,date,user_id,ipn_id,verif_id,amount,status,txn_id)
 
 	return 'hello'
 
@@ -296,26 +313,21 @@ def ipn():
 @login_required
 def success():
 	
-	
-	# should this move to the IPN?
-	# only direct users here if the subscription successed?
-	# check against mysql data first?
-	
-	session['subscription'] = "Active"
+	session['subscription'] = True
 	
 	return render_template('/payment/success.html'\
-	,Page_Name="Successful Payment",nav_links=nav_links[2:7])
+	,Page_Name="Successful Payment",nav_links=logged_in_navs)
 
 @app.route('/payment_failed')
 @login_required
 def failure():
 	
     return render_template('/payment/failure.html'\
-	,Page_Name="Payment Failed",nav_links=nav_links[2:7])
+	,Page_Name="Payment Failed",nav_links=logged_in_navs)
 
 # --------------------------------------------------
 
 # SERVER START UP
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0',debug=True,port=82)
+    app.run(host='0.0.0.0',debug=True,port=80)

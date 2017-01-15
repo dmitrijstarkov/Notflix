@@ -10,10 +10,13 @@ _BASE_URL + '/series'
 
 
 print('--------------------')
-#ALL_DBS = [MOVIE_DB,TV_DB,SERIES_DB]
-#for i in ALL_DBS:
+ALL_DBS = [MOVIE_DB,TV_DB,SERIES_DB]
+for i in ALL_DBS:
 #	delete(i)
-#	put_place(i)
+	print(get(i))
+	#if get(i).status_code == '404': 
+	put_place(i)
+	print('put' + s(i))
 print('--------------------')
 
 for dirname, dirnames, filenames in os.walk(pathtodo):
@@ -30,9 +33,15 @@ for dirname, dirnames, filenames in os.walk(pathtodo):
 			imdb = metadata(newname,pathtodo)
 			print('getting data for '+imdb+' in folder '+newname)
 			vid_meta = omdb(imdb)
-			vid_meta['server_url'] = "http://localhost:81/"+newname+"/manifest.mpd"
+			vid_meta['server_url'] = newname+"/manifest.mpd"
 			
 			vidtitle,vidtype=s(vid_meta['Title']),s(vid_meta['Type'])
+
+			# move the folder to /encoded_video folder
+			# it's now ready to be streamed...
+
+			shutil.move(pathtodo+'/'+newname, pathtoput+'/'+newname)
+			print(s(newname)+' folder moved to '+s(pathtoput))
 
 			# put / post movie data
 			
@@ -57,8 +66,3 @@ for dirname, dirnames, filenames in os.walk(pathtodo):
 				collection_check(SERIES_NFO_COLL)
 				seriespost=db_post(SERIES_NFO_COLL,series_meta)
 
-			# move the folder to /encoded_video folder
-			# it's now ready to be streamed...
-
-			shutil.move(pathtodo+'/'+newname, pathtoput+'/'+newname)
-			print(s(newname)+' folder moved to '+s(pathtoput))

@@ -3,7 +3,7 @@
 		<script src="static/dash.all.min.js"></script>
 		<script>
 			function init() {
-				var url = '{{ link }}';
+				var url = 'http://localhost:81/{{link}}';
 				var video = document.querySelector("#videoPlayer");
 				var player = dashjs.MediaPlayer().create();
 				player.initialize(video, url, true);

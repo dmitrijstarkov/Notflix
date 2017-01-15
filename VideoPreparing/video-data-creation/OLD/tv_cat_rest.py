@@ -2,7 +2,7 @@
 # Global constants for REST calls #
 # ------------------------------- #
 
-_BASE_URL = "http://video-rest:8080" # CHANGEIT
+EPISODE_URL = "ep-cat-rest" # CHANGEIT
 
 VIDEO_HEADERS = {'Content-type': 'application/hal+json', 'Accept': '*/*'}
 

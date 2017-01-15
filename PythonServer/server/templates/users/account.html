@@ -1,51 +1,64 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>Account Details</h1>
-<br>
-
-<h3>E-mail address</h3>
-
-<p>Your current email address is: Current email</p>
-
-<p>Do you want to change your current email address? </p>
-
-<form action="" method="post">
-<input type="email" placeholder="your@email.com" name="reg-email" value="{{request.form.email }}">
-<br>
-<br>
-<input class="btn btn-default2" type="submit" value="Change e-mail">
-</form>
-
-<br><br>
-
+<div id="password">
 <h3>Password</h3>
-
 <p>Want to change your password? Please make sure it is *<a href="https://itservices.uchicago.edu/page/good-password-practices"><b>secure</b></a>*</p>
-
+<p>You must provide your e-mail for verification</p>
 <form action="" method="post">
 <input type="password" placeholder="Old Password" name="reg-password-old" value="{{request.form.password }}">
 <br><br>
-<input type="password" placeholder="New Password" name="reg-password-new" value="{{request.form.password }}">
+<input type="password" placeholder="New Password" name="reg-password-new1" value="{{request.form.password }}">
 <br><br>
-<input type="password" placeholder="Repeat New Password" name="reg-password-newrepeat" value="{{request.form.password}}">
+<input type="password" placeholder="Repeat New Password" name="reg-password-new2" value="{{request.form.password}}">
+<br><br>
+<input type="email" placeholder="Provide e-mail" name="reg-email" value="{{request.form.email}}">
 <br><br>
 <input class="btn btn-default2" type="submit" value="Change Password">
 </form>
+</div>
+<br>
+<div id="account">
+<h3>Paypal History</h3>
+
+<p>Your paypal account is listed as: {{subs[1]}}</p>
+<p>Your subscription has been active since: {{subs[0]}}</p>
+<p>------------------------------------------------------------------</p>
+<div id="payment-hist">
+  <p><b>Date</b> -- <b>Amount</b> -- <b>Payment Status</b> -- <b>Transaction ID (Paypal)</b></p>
+  {% for row in payments %}
+  <p>{{row[0]}} -- £ {{row[1]}} -- {{row[2]}} -- {{row[3]}}</p>
+  {% endfor %}
+</div>
+</div>
+
+<br>
+<div id="login-hist">
+<h3>Login History</h3>
+<p>These are the last 10 successful logins from your account.</p>
+<p>If you do not recognise any, change your password.</p>
+{% for i in loginhist %}
+<li>{{i}}</li>
+{% endfor %}
+</div>
+
 
 <br>
 
-<h1>Payment Details</h1>
+<div id="video-hist">
+<h3>Viewing History</h3>
+<p> Last 10 videos:</p>
+{% for i in last10 %}
+<li>{{i}}</li>
+{% endfor %}
+
 <br>
+<p> Total views of videos:</p>
+{% for i in countvids %}
+<li>{{i}} -- {{countvids[i]}} times</li>
+{% endfor %}
 
-<p>You have paid x this month</p>
-<p>Your paypal account is listed as: xxxx</p>
-
-
-
-
-
-
-
-
+</div>
 
 {% endblock %}
+

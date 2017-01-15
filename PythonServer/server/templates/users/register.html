@@ -2,17 +2,18 @@
 {% block content %}
 
       <h1>Registration</h1>
-      <p>Please enter a username and a *<a href="https://itservices.uchicago.edu/page/good-password-practices"><b>secure</b></a>* password:<p>
+      <p>Please enter your email and a *<a href="https://itservices.uchicago.edu/page/good-password-practices"><b>secure</b></a>* password:<p>
 
       <form action="" method="post">
         
         <input type="email" placeholder="your@email.com" name="reg-email" value="{{
-          request.form.email }}">
-       <input type="password" placeholder="Password" name="reg-password" value="{{
-          request.form.password }}">
-          
+          request.form.email }}"><br><br>
+       <input type="password" placeholder="Password" name="reg-password1" value="{{
+          request.form.password }}"><br><br>
+       <input type="password" placeholder="Repeat password" name="reg-password2" value="{{
+          request.form.password }}"> <br>  <br>       
           <input type="text" placeholder="Age" name="reg-age" value="{{
-            request.form.text }}">
+            request.form.text }}"><br><br>
               
         <input class="btn btn-default" type="submit" value="Register">
       </form>

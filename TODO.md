@@ -1,39 +1,70 @@
 ## MUST DO
 
-* !!!!!!!! change / SET UP new admin passwords!
+#### pyserver
 
-* Account page!!
+* turn off server debugging
+* pyserving port 80
+* copy py files on build
 
-* paypal check!
-  * does payment work?
-  * can I put the data to mysql?
-  * should I have a seperate db ?
+#### Other dbs
 
-* PURCHASE PAGE
-  * the ngrok domain needs to be setup
-  * ENV variables?
-  * sign up and have a static domain?
-  
-* mysql - subscription table!!
-  * session subscriptions check (dependant on mysql)
-  * CHANGE THE SESSSION VALUES!!
+* split mongo videos - film + tv + series - FUCKING PORTS OR SOMETHING ?!?!?!?
+* change / SET UP new admin passwords ?!?!
+
+#### CI + Docker
 
 * finalise Dockerfiles for builds
-
-* JENKINS!
-
-
-## NICE TO HAVE
-
-* redis - what else can I use this for? so easy to set up!!
-  * write usage db to mysql on session close? or mongo?
-
-* Welcome page? - site logo?
-
-* mysql - user details??
-  * Paypal login?
+  * mysql have done! - define specific version of mysql to use?
   
-* film ratings??
+* JENKINS?!?!?
+
+* Docker swarm (not the databases)
+
+#### Done
+
+* Design page for recent payments
+* When was last payment made? - subs wrapper
+  * currently a string in db, needs to be date
+  * change session values for subs check
+* paypal check the data is being written!
+* dataget - change file moves
+* check the user set ups for mysql
+* Admin password - randomise?
+* set up users that CAN ONLY use SPs
+* NAV LINKS
+  * Dictionary
+  * Make dependant on session values (if logged in, then only login/register)  
+* ERROR MESSAGES  
+  * dictionary too  
+  
+#### IF I HAVE TIME
+
+* extra subscription / payment data into the databases?
+  * then could use name etc.
+
+* Subscription to Inactive? have a "cancel subscription" option?  
+
+* mysql rest api
+  * ALL queries through to it
+  * then off to different databases from there
+
+* PURCHASE PAGE
+  * the ngrok static domain needs to be setup
+  * ENV variables?
+  * sign up and have a static domain?
+  * would be solved by an azure jenkins build - static IP
+
+* NETWORKS - connections via container names!
+  * easier to do services + swarm mode then
+    * login network? - redises
+    * usage - redis + neo4j ???
+    * users (mysql)
+
+    * (webserver - pyserving, restheart?)
+    * (videos - dataget, mongo, rest)
+  * will need to rebuild some images - connection names will change
+
+* flask mail
 
 * Neo4j - recommendations
  * user history - from the redis store?
@@ -41,28 +72,15 @@
    * use carousel - py script input
    * can use redis to store "SCORED SETS"
 
-* docker networks
-
 * docker swarm mode
 
 * logs files from all the python scripts?
 
-______________
+#### DBs
 
-### Docker
-
-* Networking? - set up restheart on a network, connect webserver to network
-  * Makes it isolated
-  * SET IP ADDRESSES TO BE STATIC
-* Payapl transaction details 
-
-### DBs
-
-* TIMESTAMPS
+* TIMESTAMPS ?!?!
 * NEO 4J!
 * Admin passwords ALL need to change
-
-### Services
 
 #### Graph - recommendations
 
@@ -83,32 +101,21 @@ ______________
 
 * when films added, add a film node - videoprep
 * when user registers in, add a user node - pyserving
+* when film watched, add a relationship
 
-#### Videofiles/VideoPrep
+* HOW TO DO THE WALKS for the reccomendations?
 
-* Run in videoprep?
-  * stop dashify when running
-  * cron update rules?
-  * DO:
-    * iterate through ONLY todo folder (need to add this)
-    * start dashifying script for each new folder
-    * run hashing, update mongodb
-    * mongo script only puts NEW dox from todo, so nothing gets overwritten
 
-#### Users
 
-* e-mail confirmations? Flask-Mail?
-  
-* Registration
-  * send to purchase page
-  * if not completed purchase, drop from database
+## Not bothering with
 
-* Account settings - password change, email change
 
-* Payment
-  * paypal? https://developer.paypal.com/docs/classic/payflow/gs_ppa_hosted_pages/
+* clean up the episodes page
+  * ordering
+  * what if no image
 
-#### Webserver
+* Welcome page? - site logo?
 
-* Use docker ENV variables to set the Video API IP to the one in /etc/hosts of container (restpy linked container)
-* Mongo DB IP needed by both the webserver and the mongo db put script
+* redis - what else can I use this for? so easy to set up!!
+  * write usage db to mysql on session close? or mongo?
+  * user film ratings?

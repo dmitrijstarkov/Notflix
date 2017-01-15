@@ -9,4 +9,5 @@ BEGIN
 
 select user_id,user_password from login where user_email = p_email;
 
-END $$ ;
+END $$
+DELIMITER ;

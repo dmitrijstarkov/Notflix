@@ -53,7 +53,7 @@ def get(place):
 
 def put_place(place):
 	
-	putvalue = requests.put(s(place),data=None,auth=('admin','changeit'))
+	putvalue = requests.put(place,data=None,auth=login)
 	print('PUT to '+place+': '+s(putvalue.status_code))
 
 def delete(place):

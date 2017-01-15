@@ -46,6 +46,15 @@ p {
     color: white;
 }
 
+li {
+    color: white;
+}
+
+table {
+    color: white;
+}
+
+
 #navmenu ul 
 {
   background: grey; 
@@ -115,6 +124,8 @@ p {
   padding: 10px 75px 5px 20px;
   }
 
+a {color: lightblue}
+
 </style>
 </head>
 
@@ -122,7 +133,7 @@ p {
   <div id="navmenu">
     <ul>
       {% for link in nav_links %}
-    	<li><a href="{{link}}">{{link}}</a></li>
+    	<li><a href="{{nav_links[link]}}">{{link}}</a></li>
       {% endfor %}
     </ul>
   </div>

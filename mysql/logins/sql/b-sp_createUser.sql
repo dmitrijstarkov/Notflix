@@ -22,5 +22,5 @@ BEGIN
             p_password
         );
     END IF ;
-END $$ 
+END $$
 DELIMITER ;

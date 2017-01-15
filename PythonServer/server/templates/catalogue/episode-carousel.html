@@ -28,27 +28,25 @@
 
         <div class="carousel-caption">
 
-          <h4>Season: {{episode.items()[8][1]}} Episode: {{episode.items()[14][1]}}</h4>
-          <h4>{{episode.items()[2][1]}}</h4>
+          <h4>Season: {{episode['Season']}} Episode: {{episode['Episode']}}</h4>
+          <h4>{{episode['Title']}}</h4>
           <br>
-          <img src="{{episode.items()[23][1]}}" 
+          <img src="{{episode['Poster']}}" 
                 style="height:375px;float:top;margin:0 20px 0 10px;">
           <br><br>
           <form action="tv_shows" method="post">
-            <input type="hidden" name="URL" value="{{episode.items()[18][1]}}">
-            <input type="hidden" name="VIDEO TITLE" value="{{episode.items()[2][1]}}">
-            <input type="hidden" name="video_id" value="{{episode.items()[19][1]}}">
+            <input type="hidden" name="URL" value="{{episode['server_url']}}">
+            <input type="hidden" name="VIDEO TITLE" value="{{episode['Title']}}">
+            <input type="hidden" name="video_id" value="{{episode['imdbID']}}">
             <input type="hidden" name="SERIES-TF" value="False">
             <input class="btn-watch" type="submit" value="Click here to watch">
           </form>
           <br>
-          <p>
-            <b>Description: </b>{{episode.items()[0][1]}}
-          </p>
-          <p>
-            <b>Runtime:</b> {{episode.items()[19][1]}} /// 
-            <b>imdb Rating:</b> {{episode.items()[13][1]}}
-          </p> 
+          <p><b>Description: </b>{{episode['Plot']}}</p>
+          <p><b>Rated: </b> {{episode['Rated']}}</p>
+          <p><b>Runtime:</b> {{episode['Runtime']}}</p> 
+            <p><b>imdb Rating:</b> {{episode['imdbRating']}}</p> 
+          
         </div>
 
     </div>

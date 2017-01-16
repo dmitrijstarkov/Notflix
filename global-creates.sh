@@ -1,0 +1,10 @@
+docker network create --subnet=172.24.0.0/16 user
+docker volume create --name mongo-conf
+docker volume create --name mongo-data
+docker volume create --name todo-python
+docker volume create --name encoded-video
+docker volume create --name login-mysql
+docker volume create --name sub-mysql
+docker volume create --name pay-mysql
+docker volume create --name usage-history
+docker volume create --name login-attempts

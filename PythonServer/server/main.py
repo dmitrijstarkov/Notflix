@@ -12,8 +12,6 @@ from werkzeug import generate_password_hash, check_password_hash
 from werkzeug.datastructures import ImmutableOrderedMultiDict
 import json, os, datetime, time
 
-
-
 # --------------------------------------------------
 
 # my modules
@@ -53,7 +51,6 @@ numbs_pass\
 
 from client_messages import error_dict
 
-
 # global stuff
 # --------------------------------------------------
 
@@ -61,7 +58,7 @@ from client_messages import error_dict
 app = Flask(__name__)
 
 # Super secret cookie session key
-app.secret_key=generate_password_hash(os.urandom(24))
+app.secret_key = generate_password_hash(os.urandom(24))
 
 # --------------------------------------------------
 
@@ -164,8 +161,6 @@ def login():
 				
 				if sub_check(session['user_id']) == True:
 					session['subscription'] = True
-				else:
-					session['subscription'] = False
 
 				return redirect(url_for('films_cat'))			
 
@@ -267,7 +262,6 @@ def register():
 						mysqldata=login_check(email,password1)
 						session['user_id'] = mysqldata[0][0]
 						session['logged_in'] = True
-						session['subscription'] = False
 						flash(s(error_dict['registered_success']) + s(email))
 						return redirect(url_for('purchase'))
 				

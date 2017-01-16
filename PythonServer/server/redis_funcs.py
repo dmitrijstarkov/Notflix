@@ -22,14 +22,14 @@ def usage_hist(in1,in2):
 def get_usage(in1):
 	
 	if r_usage.llen(in1) == 0:
-		return None
+		return ["You haven't watched anything yet!"]
 	else:
 		return r_usage.lrange(in1,0,10)
 		
 def count_usage(in1):
 	
 	if r_usage.llen(in1) == 0:
-		return None
+		return ["You haven't watched anything yet!"]
 	else:
 		data = r_usage.lrange(in1,0,r_usage.llen(in1))
 		newdict={}
@@ -47,6 +47,9 @@ def login_hist_add(in1):
 	return data[0].split('.')[0]
 
 def login_hist_get(in1):
-
-	data = [i.split('.')[0] for i in r_login_hist.lrange(in1,0,10)]
-	return data
+	
+	if r_login_hist.llen(in1)==0:
+		return ["This is your first time on the site!"]
+	else:
+		data = [i.split('.')[0] for i in r_login_hist.lrange(in1,0,10)]
+		return data

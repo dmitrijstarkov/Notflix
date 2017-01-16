@@ -1,8 +1,8 @@
 DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_login16`(
+CREATE DEFINER=`admin`@`localhost` PROCEDURE `sp_login16`(
 
 IN p_email VARCHAR(120),
-IN p_password VARCHAR(120)
+IN p_password VARCHAR(200)
 )
 
 BEGIN

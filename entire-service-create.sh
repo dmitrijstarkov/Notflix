@@ -1,15 +1,15 @@
 ##### ------------------ Misc bodge stuff
 
-ngrok http 80
+#ngrok http 80
 
-echo curl -G http://127.0.0.1:4040/api/tunnels
+#echo curl -G http://127.0.0.1:4040/api/tunnels
 
-cd ~/POSTGRAD/Docker/Notflix
+#cd ~/POSTGRAD/Docker/Notflix
 
-cp -r local/videofiles/test data/* local/videofiles/todo_dashify
+#cp -r local/videofiles/test data/* local/videofiles/todo_dashify
 
 # DON'T FORGET TO CHANGE THE PURCHASE PAGE ADDRESS!!!
-echo "DON'T FORGET TO CHANGE THE PURCHASE PAGE ADDRESS!!!"
+#echo "DON'T FORGET TO CHANGE THE PURCHASE PAGE ADDRESS!!!"
 
 ##### ------------------ remove existing docker infrastructure
 

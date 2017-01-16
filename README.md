@@ -4,6 +4,9 @@ Video Streaming service using DevOps infrastructure and methodology.
 
 To run in one go, run the global shell scripts file. You must use ngrok use the payments service (requires editing loopback url) or have it depolyed on an azure machine (payapl don't allow sandbox loopbacks to localhost unfortunately). 
 
+You must have set up a local directory - local/videofiles/todo_dashify
+This is where the test video files must be stored before runtime
+
 Individual shells scripts are provided for individual container running.
 
 There are test video files that will be used for Demo.

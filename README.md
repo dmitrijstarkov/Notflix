@@ -1,53 +1,47 @@
-## Notflix 0.0.10
+## Notflix
 
-### Python:
+Video Streaming service using DevOps infrastructure and methodology.
 
-#### Module Requirements:
+To run in one go, run the global shell scripts file. You must use ngrok use the payments service (requires editing loopback url) or have it depolyed on an azure machine (payapl don't allow sandbox loopbacks to localhost unfortunately). 
 
-* **Flask** (http://flask.pocoo.org/) to do the web serving.
-* **Requests** (https://pypi.python.org/pypi/requests) to do the the API requests.
-* **JSON** (https://pypi.python.org/pypi/json) to format things as JSON strings
-* **FUNCTOOLS** (https://pypi.python.org/pypi/functools) to use wrap()
+Individual shells scripts are provided for individual container running.
 
-#### How it works
+There are test video files that will be used for Demo.
 
-* @app.route(website page , http request methods) - defines "web pages"
-* def page() - functions to run when page's app.route is called by client
-* def loginrequired() - controls which pages need logins to work
-* rendertemplate - display template (templates folder)
-  * note that templates work differently to base html
-  * there is one base template (nav menu, footers etc.)
-  * other templates are then called inside that base template, generating the actual page
-* redirect(url_for()) - move to a different page for whatever reason
-* GETS from a webpage with Flask need to be made with input forms
+Tech used:
 
-#### More how it works
+* docker networking
+* docker links
+* redis
+* mongodb
+* restheart API
+* mysql
+* docker builds
+* docker persistant volumes
+* Python - Flask webserver
+* nginx video server
+* bootstrap
+* Jinja templates
 
-		payloadtv=get_resource(EP_COLLECTION_URL,params=None).json()
+probably some more too...
 
--- assign to payload tv the result of GET call to mongo db collection "episodes" with no parameters (bring back all the data)
+List of containers:
 
-    app = Flask(__name__)
+* Dashifying - Encodes video files and moves between volumes on completion
+* Data-get uses OMDBapi.com's api to get video meta data, and store for streaming. 
+* Mongo-video - stores video meta data
+* Restheart API - handles webseerver requests to mongo-video
+* neo4j-data-get - reads data in the mongo-video db, reformats it and stores it in neo4j for recommendations.
+ * n.b. this is storing the data incorrectly, didn't have time to fix
+* rec_server - stores movie realtionships via genre, writers, directors, actors (for recommendation generation)
+* logins-db - stores login data for users - only allows stored procedures to be run by the webserver - no general SELECT statements.
+* payments-db - stores payments from paypal
+* subscriptions-db - stores subscription details from paypal
+* usage-db - stores a user's viewing history
+* login-attempts-db - restricts user access after 5 login attemots in 60 seconds
+* login history db - stores datetime of user logins
 
--- defines the script as "app"
+Things I wanted to do but didn't have time:
 
-    if __name__ == '__main__':
-        app.run(host='0.0.0.0',debug=True,port=82)
-
--- where to host the server (dokcer container maps local:80 to python:82)
-
-### Getting video data from Mongo container
-
-* Lines 55 - 81 in the main.py file
-* Does two GET calls (not finised films yet), convert the JSON to dictionary, passes dictionary to webpage.
-* Once client clicks on a button (input form submit in catalogue.html), POSTs back to the server, video page retrieved and streamed
-
-
-### Video Server Container
-
-* Uses Nginx (jgmp VideoServer container)
-* Videos stored in hashed folders with video files + metadata.txt (imdb id)
-* manifest.mpd is the file needed to play the stream with dash.js
-* Python connects to VideoServer container through localhost:81/hashed folder/manifest.mpd
-* UPDATE: I have an extra service to add. Takes the imdb id and calls from OMDBapi.com, then adds to the video catalogue database.
-
+* Docker swarm - without sorting replication out for all database, this would have been difficult. Understand it and have seperate code for set-up that I could demo.
+* mysql rest api - have all the mysql requests code. combining with python flask would allow for this to be developed into a *secure* REST docker container.

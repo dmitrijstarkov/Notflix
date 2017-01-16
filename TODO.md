@@ -3,8 +3,6 @@
 #### pyserver
 
 * turn off server debugging
-* pyserving port 80
-* copy py files on build
 
 #### Other dbs
 
@@ -36,7 +34,9 @@
   * Make dependant on session values (if logged in, then only login/register)  
 * ERROR MESSAGES  
   * dictionary too  
-  
+* pyserving port 80
+* copy py files on build
+
 #### IF I HAVE TIME
 
 * extra subscription / payment data into the databases?

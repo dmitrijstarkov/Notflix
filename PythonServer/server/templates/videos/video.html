@@ -23,4 +23,19 @@
       <br><br>
 			<video id="videoPlayer" controls ="true"> </video>
 		</div>
+    
+    <br>
+    {% if not recs %}
+    <br>
+    {% else %}
+    <p>If you enjoyed this, why not try one of these reccomendations?</p>
+    <p>*** Not actually working yet (returning all after walking genres)</p>    
+    <p>*** You get the idea though</p>    
+
+    {% for i in recs %}
+    <li>{{i}}</i>
+    {% endfor %}
+    {% endif %}
+    
+  
 {% endblock %}

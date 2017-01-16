@@ -12,6 +12,8 @@ from werkzeug import generate_password_hash, check_password_hash
 from werkzeug.datastructures import ImmutableOrderedMultiDict
 import json, os, datetime, time
 
+
+
 # --------------------------------------------------
 
 # my modules
@@ -25,6 +27,8 @@ s\
 , omdb
 
 from video_api_funcs import  populate_cat, populate_eps
+
+from neo_funcs import reccomendations
 
 from redis_funcs import\
 login_hist_get\
@@ -73,10 +77,11 @@ def films_cat():
 	if request.method == 'POST':
 		title = request.form['VIDEO TITLE']
 		usage_hist(session['user_id'],title)
+		recs_list = reccomendations(s(request.form['video_id']))
 		
 		return render_template('/videos/video.html'\
 		,link=request.form['URL'],name=title\
-		,Page_Name=title\
+		,Page_Name=title,recs=recs_list\
 		,nav_links=logged_in_navs,back='/films')
 	
 	# display the films catalogue	
@@ -129,7 +134,11 @@ def tv_cat():
 @app.route('/', methods=['GET', 'POST'])
 def login():
 
-
+	if 'logged in' in session:
+		navs = logged_in_navs
+	else:
+		navs = no_login_navs
+		
 	error = None
 	if request.method == 'POST':
 		
@@ -177,7 +186,7 @@ def login():
 						
 	return render_template('/users/login.html'\
 	,error=error\
-	,Page_Name="Login",nav_links=no_login_navs)
+	,Page_Name="Login",nav_links=navs)
 
 @app.route('/logout')
 @login_required
@@ -232,7 +241,11 @@ def account():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-
+	
+	if 'logged in' in session:
+		navs = logged_in_navs
+	else:
+		navs = no_login_navs
 	error = None
 	
 	if request.method == 'POST':
@@ -268,7 +281,7 @@ def register():
 			error = error_dict['reg_forms_error']
 		
 	return render_template('/users/register.html',error=error\
-	,Page_Name="Registration",nav_links=no_login_navs)
+	,Page_Name="Registration",nav_links=navs)
 
 @app.route('/purchase')
 @login_required
@@ -330,4 +343,4 @@ def failure():
 # SERVER START UP
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0',debug=True,port=80)
+    app.run(host='0.0.0.0',debug=True,port=82)
